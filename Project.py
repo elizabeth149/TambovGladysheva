@@ -8,8 +8,7 @@ size = width1, height1 = 900, 900
 screen = pygame.display.set_mode(size)
 background = pygame.image.load('back.jpg')
 field = pygame.image.load('поле.png')
-field1 = pygame.image.load('поле.png')
-pygame.display.set_caption("Морской бой")
+pygame.display.set_caption("Сапер")
 
 
 class Sap:
@@ -59,32 +58,14 @@ class Minesweeper(Sap):
         b = 0
         for y in range(self.width):
             for x in range(self.height):
-                if self.board[x][y] == 1:
-                    pygame.draw.rect(screen, (255, 255, 255),
-                                     (x * self.cell_size +
-                                      self.left,
-                                      y *
-                                      self.cell_size +
-                                      self.top,
-                                      self.cell_size,
-                                      self.cell_size), 1)
-                else:
-                    pygame.draw.rect(screen, (255, 0, 0),
-                                     (x * self.cell_size +
-                                      self.left,
-                                      y *
-                                      self.cell_size +
-                                      self.top,
-                                      self.cell_size,
-                                      self.cell_size), 0)
-                    pygame.draw.rect(screen, (255, 255, 255),
-                                     (x * self.cell_size +
-                                      self.left,
-                                      y *
-                                      self.cell_size +
-                                      self.top,
-                                      self.cell_size,
-                                      self.cell_size), 1)
+                pygame.draw.rect(screen, (210, 180, 140),
+                                 (x * self.cell_size +
+                                  self.left,
+                                  y *
+                                  self.cell_size +
+                                  self.top,
+                                  self.cell_size,
+                                  self.cell_size), 1)
 
     def open_cell(self, mouse_pos):
         a, b = mouse_pos
@@ -222,8 +203,7 @@ class Minesweeper(Sap):
                                y1 * self.cell_size + self.top])
 
 
-
-minesweeper = Minesweeper(15, 15, 10)
+minesweeper = Minesweeper(15, 15, 20)
 sap = Sap()
 running = True
 fl = True
@@ -232,14 +212,13 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type != pygame.QUIT and fl:
-            screen.blit(background, (0, 0))
         if event.type == pygame.MOUSEBUTTONDOWN:
+            fl = False
             minesweeper.open_cell(event.pos)
-        if event.type != pygame.MOUSEBUTTONDOWN and fl:
+        if event.type != pygame.MOUSEBUTTONDOWN:
             screen.blit(background, (0, 0))
-        minesweeper.render()
-        sap.drawWindow()
-
+            screen.blit(field, (230, 300))
+            minesweeper.render()
+            sap.drawWindow()
     pygame.display.flip()
 pygame.quit()  # точное закрытие окна
