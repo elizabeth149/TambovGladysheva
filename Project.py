@@ -32,6 +32,14 @@ class Sap:
             b = random.randint(0, self.width - 1)
             self.board[a][b] = 10
 
+    def drawWindow(self):
+        if pygame.mouse.get_focused():
+            fullname = os.path.join('data', 'curs.png')
+            image = pygame.image.load(fullname).convert()
+            pygame.mouse.set_visible(False)
+            MANUAL_CURSOR = pygame.image.load(
+                fullname).convert_alpha()
+            screen.blit(MANUAL_CURSOR, (pygame.mouse.get_pos()))
 
 class Minesweeper(Sap):
     def __init__(self, width, height, count):
@@ -178,16 +186,24 @@ class Minesweeper(Sap):
                 if self.board[x1 + 1][y1 + 1] == 10:
                     min += 1
                 self.cor.append([str(min), x1, y1])
+        else:
+            self.cor.append([55555, x1, y1])
 
     def draw(self):
         for i in self.cor:
             min = i[0]
             x1 = i[1]
             y1 = i[2]
-            font = pygame.font.Font(None, 25)
-            text = font.render(min, True, (0, 255, 0))
-            screen.blit(text, [int(x1) * self.cell_size + self.left,
+            if min != 55555:
+                font = pygame.font.Font(None, 25)
+                text = font.render(min, True, (255, 235, 205))
+                screen.blit(text, [int(x1) * self.cell_size + self.left,
                            int(y1) * self.cell_size + self.top])
+            else:
+                fullname = os.path.join('data', 'flag.png')
+                MANUAL_CURSOR = pygame.image.load(
+                    fullname).convert_alpha()
+                screen.blit(MANUAL_CURSOR, (x1 * self.cell_size + self.left, y1 * self.cell_size + self.top))
 
 
 minesweeper = Minesweeper(15, 15, 20)
@@ -207,5 +223,6 @@ while running:
             screen.blit(field, (230, 300))
             minesweeper.render()
             minesweeper.draw()
+            sap.drawWindow()
     pygame.display.flip()
 pygame.quit()  # точное закрытие окна
