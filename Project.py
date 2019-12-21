@@ -26,15 +26,6 @@ class Sap:
         self.cell_size = 30
         self.rast()
 
-    def drawWindow(self):
-        if pygame.mouse.get_focused():
-            fullname = os.path.join('data', 'curs.png')
-            image = pygame.image.load(fullname).convert()
-            pygame.mouse.set_visible(False)
-            MANUAL_CURSOR = pygame.image.load(
-                fullname).convert_alpha()
-            screen.blit(MANUAL_CURSOR, (pygame.mouse.get_pos()))
-
     def rast(self):
         for i in range(self.count):
             a = random.randint(0, self.height - 1)
@@ -52,6 +43,7 @@ class Minesweeper(Sap):
         self.top = 300
         self.cell_size = 30
         self.rast()
+        self.cor = []
 
     def render(self):
         a = 0
@@ -67,140 +59,135 @@ class Minesweeper(Sap):
                                   self.cell_size,
                                   self.cell_size), 1)
 
-    def open_cell(self, mouse_pos):
+    def open_cell(self, mouse_pos, button):
         a, b = mouse_pos
         min = 0
         x1 = (a - self.left) // self.cell_size
         y1 = (b - self.top) // self.cell_size
-        if 0 < x1 < self.height - 1 and 0 < y1 < self.width - 1 and \
-                self.board[x1][y1] != 10:
-            if self.board[x1 - 1][y1 - 1] == 10:
-                min += 1
-            if self.board[x1][y1 - 1] == 10:
-                min += 1
-            if self.board[x1 + 1][y1 - 1] == 10:
-                min += 1
-            if self.board[x1 - 1][y1] == 10:
-                min += 1
-            if self.board[x1 + 1][y1] == 10:
-                min += 1
-            if self.board[x1 - 1][y1 + 1] == 10:
-                min += 1
-            if self.board[x1][y1 + 1] == 10:
-                min += 1
-            if self.board[x1 + 1][y1 + 1] == 10:
-                min += 1
+        if button == 1:
+            if 0 < x1 < self.height - 1 and 0 < y1 < self.width - 1 and \
+                    self.board[x1][y1] != 10:
+                if self.board[x1 - 1][y1 - 1] == 10:
+                    min += 1
+                if self.board[x1][y1 - 1] == 10:
+                    min += 1
+                if self.board[x1 + 1][y1 - 1] == 10:
+                    min += 1
+                if self.board[x1 - 1][y1] == 10:
+                    min += 1
+                if self.board[x1 + 1][y1] == 10:
+                    min += 1
+                if self.board[x1 - 1][y1 + 1] == 10:
+                    min += 1
+                if self.board[x1][y1 + 1] == 10:
+                    min += 1
+                if self.board[x1 + 1][y1 + 1] == 10:
+                    min += 1
+                self.cor.append([str(min), x1, y1])
+            elif x1 == 0 and y1 == 0 and self.board[x1][y1] != 10:
+                if self.board[x1 + 1][y1] == 10:
+                    min += 1
+                if self.board[x1 + 1][y1 + 1] == 10:
+                    min += 1
+                if self.board[x1][y1 + 1] == 10:
+                    min += 1
+                self.cor.append([str(min), x1, y1])
+            elif x1 == 0 and 0 < y1 < self.width - 1 and self.board[x1][
+                y1] != 10:
+
+                if self.board[x1][y1 - 1] == 10:
+                    min += 1
+                if self.board[x1 + 1][y1 - 1] == 10:
+                    min += 1
+                if self.board[x1 + 1][y1] == 10:
+                    min += 1
+                if self.board[x1][y1 + 1] == 10:
+                    min += 1
+                if self.board[x1 + 1][y1 + 1] == 10:
+                    min += 1
+                self.cor.append([str(min), x1, y1])
+            elif x1 == 0 and y1 == self.width - 1 and self.board[x1][y1] != 10:
+                if self.board[x1][y1 - 1] == 10:
+                    min += 1
+                if self.board[x1 + 1][y1 - 1] == 10:
+                    min += 1
+                if self.board[x1 + 1][y1] == 10:
+                    min += 1
+                self.cor.append([str(min), x1, y1])
+            elif 0 < x1 < self.height - 1 and y1 == self.width - 1 and \
+                    self.board[x1][y1] != 10:
+
+                if self.board[x1 - 1][y1] == 10:
+                    min += 1
+                if self.board[x1][y1 - 1] == 10:
+                    min += 1
+                if self.board[x1 + 1][y1] == 10:
+                    min += 1
+                if self.board[x1 - 1][y1 - 1] == 10:
+                    min += 1
+                if self.board[x1 + 1][y1 - 1] == 10:
+                    min += 1
+                self.cor.append([str(min), x1, y1])
+            elif x1 == self.height - 1 and y1 == self.width - 1 and \
+                    self.board[x1][
+                        y1] != 10:
+
+                if self.board[x1 - 1][y1] == 10:
+                    min += 1
+                if self.board[x1 - 1][y1 - 1] == 10:
+                    min += 1
+                if self.board[x1][y1 - 1] == 10:
+                    min += 1
+                self.cor.append([str(min), x1, y1])
+            elif x1 == self.height - 1 and 0 < y1 < self.width - 1 and \
+                    self.board[x1][y1] != 10:
+
+                if self.board[x1][y1 - 1] == 10:
+                    min += 1
+                if self.board[x1 - 1][y1 - 1] == 10:
+                    min += 1
+                if self.board[x1 - 1][y1] == 10:
+                    min += 1
+                if self.board[x1 - 1][y1 + 1] == 10:
+                    min += 1
+                if self.board[x1][y1 + 1] == 10:
+                    min += 1
+                self.cor.append([str(min), x1, y1])
+
+            elif x1 == self.height - 1 and y1 == 0 and self.board[x1][
+                y1] != 10:
+                if self.board[x1 - 1][y1] == 10:
+                    min += 1
+                if self.board[x1 - 1][y1 + 1] == 10:
+                    min += 1
+                if self.board[x1][y1 + 1] == 10:
+                    min += 1
+                self.cor.append([str(min), x1, y1])
+
+            elif 0 < x1 < self.height - 1 and y1 == 0 and self.board[x1][
+                y1] != 10:
+
+                if self.board[x1 - 1][y1] == 10:
+                    min += 1
+                if self.board[x1 + 1][y1] == 10:
+                    min += 1
+                if self.board[x1 - 1][y1 + 1] == 10:
+                    min += 1
+                if self.board[x1][y1 + 1] == 10:
+                    min += 1
+                if self.board[x1 + 1][y1 + 1] == 10:
+                    min += 1
+                self.cor.append([str(min), x1, y1])
+
+    def draw(self):
+        for i in self.cor:
+            min = i[0]
+            x1 = i[1]
+            y1 = i[2]
             font = pygame.font.Font(None, 25)
-            text = font.render(str(min), True, (0, 255, 0))
-            screen.blit(text, [x1 * self.cell_size + self.left,
-                               y1 * self.cell_size + self.top])
-        elif x1 == 0 and y1 == 0 and self.board[x1][y1] != 10:
-            if self.board[x1 + 1][y1] == 10:
-                min += 1
-            if self.board[x1 + 1][y1 + 1] == 10:
-                min += 1
-            if self.board[x1][y1 + 1] == 10:
-                min += 1
-            font = pygame.font.Font(None, 25)
-            text = font.render(str(min), True, (0, 255, 0))
-            screen.blit(text, [x1 * self.cell_size + self.left,
-                               y1 * self.cell_size + self.top])
-        elif x1 == 0 and 0 < y1 < self.width - 1 and self.board[x1][y1] != 10:
-            if self.board[x1][y1 - 1] == 10:
-                min += 1
-            if self.board[x1 + 1][y1 - 1] == 10:
-                min += 1
-            if self.board[x1 + 1][y1] == 10:
-                min += 1
-            if self.board[x1][y1 + 1] == 10:
-                min += 1
-            if self.board[x1 + 1][y1 + 1] == 10:
-                min += 1
-            font = pygame.font.Font(None, 25)
-            text = font.render(str(min), True, (0, 255, 0))
-            screen.blit(text, [x1 * self.cell_size + self.left,
-                               y1 * self.cell_size + self.top])
-        elif x1 == 0 and y1 == self.width - 1 and self.board[x1][y1] != 10:
-            if self.board[x1][y1 - 1] == 10:
-                min += 1
-            if self.board[x1 + 1][y1 - 1] == 10:
-                min += 1
-            if self.board[x1 + 1][y1] == 10:
-                min += 1
-            font = pygame.font.Font(None, 25)
-            text = font.render(str(min), True, (0, 255, 0))
-            screen.blit(text, [x1 * self.cell_size + self.left,
-                               y1 * self.cell_size + self.top])
-        elif 0 < x1 < self.height - 1 and y1 == self.width - 1 and \
-                self.board[x1][y1] != 10:
-            if self.board[x1 - 1][y1] == 10:
-                min += 1
-            if self.board[x1][y1 - 1] == 10:
-                min += 1
-            if self.board[x1 + 1][y1] == 10:
-                min += 1
-            if self.board[x1 - 1][y1 - 1] == 10:
-                min += 1
-            if self.board[x1 + 1][y1 - 1] == 10:
-                min += 1
-            font = pygame.font.Font(None, 25)
-            text = font.render(str(min), True, (0, 255, 0))
-            screen.blit(text, [x1 * self.cell_size + self.left,
-                               y1 * self.cell_size + self.top])
-        elif x1 == self.height - 1 and y1 == self.width - 1 and self.board[x1][
-            y1] != 10:
-            if self.board[x1 - 1][y1] == 10:
-                min += 1
-            if self.board[x1 - 1][y1 - 1] == 10:
-                min += 1
-            if self.board[x1][y1 - 1] == 10:
-                min += 1
-            font = pygame.font.Font(None, 25)
-            text = font.render(str(min), True, (0, 255, 0))
-            screen.blit(text, [x1 * self.cell_size + self.left,
-                               y1 * self.cell_size + self.top])
-        elif x1 == self.height - 1 and 0 < y1 < self.width - 1 and \
-                self.board[x1][y1] != 10:
-            if self.board[x1][y1 - 1] == 10:
-                min += 1
-            if self.board[x1 - 1][y1 - 1] == 10:
-                min += 1
-            if self.board[x1 - 1][y1] == 10:
-                min += 1
-            if self.board[x1 - 1][y1 + 1] == 10:
-                min += 1
-            if self.board[x1][y1 + 1] == 10:
-                min += 1
-            font = pygame.font.Font(None, 25)
-            text = font.render(str(min), True, (0, 255, 0))
-            screen.blit(text, [x1 * self.cell_size + self.left,
-                               y1 * self.cell_size + self.top])
-        elif x1 == self.height - 1 and y1 == 0 and self.board[x1][y1] != 10:
-            if self.board[x1 - 1][y1] == 10:
-                min += 1
-            if self.board[x1 - 1][y1 + 1] == 10:
-                min += 1
-            if self.board[x1][y1 + 1] == 10:
-                min += 1
-            font = pygame.font.Font(None, 25)
-            text = font.render(str(min), True, (0, 255, 0))
-            screen.blit(text, [x1 * self.cell_size + self.left,
-                               y1 * self.cell_size + self.top])
-        elif 0 < x1 < self.height - 1 and y1 == 0 and self.board[x1][y1] != 10:
-            if self.board[x1 - 1][y1] == 10:
-                min += 1
-            if self.board[x1 + 1][y1] == 10:
-                min += 1
-            if self.board[x1 - 1][y1 + 1] == 10:
-                min += 1
-            if self.board[x1][y1 + 1] == 10:
-                min += 1
-            if self.board[x1 + 1][y1 + 1] == 10:
-                min += 1
-            font = pygame.font.Font(None, 25)
-            text = font.render(str(min), True, (0, 255, 0))
-            screen.blit(text, [x1 * self.cell_size + self.left,
-                               y1 * self.cell_size + self.top])
+            text = font.render(min, True, (0, 255, 0))
+            screen.blit(text, [int(x1) * self.cell_size + self.left,
+                           int(y1) * self.cell_size + self.top])
 
 
 minesweeper = Minesweeper(15, 15, 20)
@@ -214,11 +201,11 @@ while running:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             fl = False
-            minesweeper.open_cell(event.pos)
+            minesweeper.open_cell(event.pos, event.button)
         if event.type != pygame.MOUSEBUTTONDOWN:
             screen.blit(background, (0, 0))
             screen.blit(field, (230, 300))
             minesweeper.render()
-            sap.drawWindow()
+            minesweeper.draw()
     pygame.display.flip()
 pygame.quit()  # точное закрытие окна
