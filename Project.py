@@ -2,17 +2,65 @@ import pygame
 import random
 import copy
 import os
+import sys
 
 pygame.init()
 size = width1, height1 = 900, 900
 screen = pygame.display.set_mode(size)
 background = pygame.image.load('back.jpg')
+end = pygame.image.load('data/end.jpg')
 field = pygame.image.load('поле.png')
 pygame.display.set_caption("Сапер")
 FPS = 200
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 cor = []
+bomb = False
+
+
+def terminate():
+    pygame.quit()
+    sys.exit()
+
+
+def start_screen():
+    intro_text = ["                САПЕР", "",
+                  "", "",
+                  "1. Число в ячейке показывает, сколько мин",
+                  "скрыто вокруг данной ячейки."
+                  "Это число поможет понять вам,",
+                  "где находятся безопасные ячейки, а где находятся бомбы. ",
+                  "2. Если рядом с открытой ячейкой есть ",
+                  "пустая ячейка, то она откроется автоматически. ",
+                  "3. Если вы открыли ячейку с миной, то ",
+                  "игра проиграна. ",
+                  "4. Что бы пометить ячейку, в которой ",
+                  "находится бомба, нажмите её правой кнопкой мыши.",
+                  "5. Игра продолжается до тех пор, пока ",
+                  "вы не откроете все не заминированные ячейки."
+                  ]
+
+    fon = pygame.transform.scale(load_image('fon.jpg'), (900, 900))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 40)
+    text_coord = 50
+    for line in intro_text:
+        string_rendered = font.render(line, 1, (0, 0, 0))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+    clock = pygame.time.Clock()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                return False
+        pygame.display.flip()
+        clock.tick(FPS)
 
 
 def load_image(name, colorkey=-1):
@@ -28,16 +76,15 @@ def load_image(name, colorkey=-1):
 
 
 class AnimatedSprite(pygame.sprite.Sprite):
-    def __init__(self, sheet, columns, rows, x, y):
+    def __init__(self, sheet, columns, rows, xy, flag=False):
         super().__init__(all_sprites)
-        self.cut_sheet(sheet, columns, rows)
+        x, y = xy
+        self.cut_sheet(sheet, columns, rows, x, y, flag)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.rect = self.rect.move(x, y)
-        self.x = x
-        self.y = y
 
-    def cut_sheet(self, sheet, columns, rows):
+    def cut_sheet(self, sheet, columns, rows, x, y, flag):
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
                                 sheet.get_height() // rows)
         self.frames = []
@@ -46,16 +93,23 @@ class AnimatedSprite(pygame.sprite.Sprite):
                 frame_location = (self.rect.w * i, self.rect.h * j)
                 self.frames.append(sheet.subsurface(pygame.Rect(
                     frame_location, self.rect.size)))
-        for i in self.frames:
-            image = i.convert_alpha()
-            screen.blit(image, (50, 50))
-            pygame.display.flip()
-            clock.tick(100)
-            screen.blit(background, (0, 0))
-            screen.blit(field, (230, 300))
-            minesweeper.render()
-            draw()
-            sap.drawWindow()
+
+        screen.blit(background, (0, 0))
+        screen.blit(field, (230, 300))
+        minesweeper.render()
+        draw()
+        if flag:
+            for i in self.frames:
+                image = i.convert_alpha()
+                screen.blit(image, (x - 50, y - 50))
+                pygame.display.flip()
+                clock.tick(100)
+                screen.blit(background, (0, 0))
+                screen.blit(field, (230, 300))
+                minesweeper.render()
+                draw()
+            global fl
+            fl = False
 
 
 class Sap:
@@ -234,6 +288,8 @@ class Minesweeper(Sap):
                 if self.board[x1 + 1][y1 + 1] == 10:
                     min += 1
                 cor.append([str(min), x1, y1])
+            elif self.board[x1][y1] == 10:
+                cor.append([10, x1, y1])
         else:
             cor.append([55555, x1, y1])
 
@@ -255,29 +311,35 @@ def draw():
             screen.blit(MANUAL_CURSOR, (x1 * 30 + 230,
                                         y1 * 30 + 300))
         else:
-            dragon = AnimatedSprite(load_image("bomb.png"), 9,
-                                    9,
-                                    x1 * 30 + 230,
-                                     y1 * 30 + 300)
+            global bomb
+            bomb = True
 
 
 minesweeper = Minesweeper(15, 15, 20)
 sap = Sap()
 running = True
 fl = True
+start_screen()
 while running:
-    pygame.time.delay(10)
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            fl = False
-            minesweeper.open_cell(event.pos, event.button)
-
-        screen.blit(background, (0, 0))
-        screen.blit(field, (230, 300))
-        minesweeper.render()
-        draw()
-        sap.drawWindow()
-    pygame.display.flip()
+        if fl:
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                minesweeper.open_cell(event.pos, event.button)
+                dragon = AnimatedSprite(load_image("bomb.png"), 9,
+                                        9,
+                                        event.pos, bomb)
+            screen.blit(background, (0, 0))
+            screen.blit(field, (230, 300))
+            minesweeper.render()
+            draw()
+            sap.drawWindow()
+            pygame.time.delay(20)
+            pygame.display.flip()
+        else:
+            screen.blit(end, (0, 0))
+            pygame.display.flip()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                running = False
 pygame.quit()  # точное закрытие окна
