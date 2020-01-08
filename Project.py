@@ -9,6 +9,7 @@ size = width1, height1 = 900, 900
 screen = pygame.display.set_mode(size)
 background = pygame.image.load('back.jpg')
 end = pygame.image.load('data/end.jpg')
+win = pygame.image.load('data/win.png')
 field = pygame.image.load('поле.png')
 pygame.display.set_caption("Сапер")
 FPS = 200
@@ -16,7 +17,7 @@ clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 cor = []
 bomb = False
-count_flags = 10
+count_flags = 20
 
 
 def terminate():
@@ -117,16 +118,14 @@ class Sap:
     def __init__(self):
         self.width = 50
         self.height = 50
-        self.count = 10
+        self.count = 20
         self.board = [[1] * self.width for _ in range(self.height)]
         self.left = 10
         self.top = 10
         self.fps = 45
-        self.board = [[1] * self.width for _ in range(self.height)]
         self.left = 10
         self.top = 10
         self.cell_size = 30
-        self.rast()
 
     def rast(self):
         for i in range(self.count):
@@ -156,8 +155,6 @@ class Minesweeper(Sap):
         self.rast()
 
     def render(self):
-        a = 0
-        b = 0
         for y in range(self.width):
             for x in range(self.height):
                 pygame.draw.rect(screen, (210, 180, 140),
@@ -170,6 +167,7 @@ class Minesweeper(Sap):
                                   self.cell_size), 1)
 
     def open_cell(self, mouse_pos, button):
+        global count_flags
         global cor
         a, b = mouse_pos
         min = 0
@@ -298,10 +296,10 @@ class Minesweeper(Sap):
                     min += 1
                 if [55555, x1, y1] not in cor:
                     cor.append([str(min), x1, y1])
-            elif 0 < x1 < self.height - 1 and 0 < y1 < self.width - 1:
+            elif 0 <= x1 <= self.height - 1 and 0 <= y1 <= self.width - 1:
                 if self.board[x1][y1] == 10:
                     cor.append([10, x1, y1])
-        elif button == 3 and 0 < x1 < self.height - 1 and 0 < y1 < self.width - 1:
+        elif button == 3 and 0 <= x1 < self.height and 0 <= y1 < self.width:
             global count_flags
             if [55555, x1, y1] in cor:
                 d = cor.index([55555, x1, y1])
@@ -311,6 +309,16 @@ class Minesweeper(Sap):
                 if count_flags != 0:
                     cor.append([55555, x1, y1])
                     count_flags -= 1
+        elif button == 2:
+            win_flag = True
+            if count_flags == 0:
+                for i in cor:
+                    if i[0] == 55555:
+                        if self.board[i[1]][i[2]] != 10:
+                            win_flag = False
+                if win_flag:
+                    screen.blit(win, (0, 0))
+                    pygame.display.flip()
 
 
 def draw():
@@ -334,6 +342,7 @@ def draw():
             bomb = True
 
 
+
 minesweeper = Minesweeper(15, 15, 20)
 sap = Sap()
 running = True
@@ -354,8 +363,7 @@ while running:
             screen.blit(field, (230, 300))
             minesweeper.render()
             draw()
-            sap.drawWindow()
-            pygame.time.delay(20)
+            pygame.time.delay(1)
             pygame.display.flip()
 
         else:
