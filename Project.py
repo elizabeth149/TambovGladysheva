@@ -16,6 +16,7 @@ clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 cor = []
 bomb = False
+count_flags = 10
 
 
 def terminate():
@@ -116,7 +117,7 @@ class Sap:
     def __init__(self):
         self.width = 50
         self.height = 50
-        self.count = 5
+        self.count = 10
         self.board = [[1] * self.width for _ in range(self.height)]
         self.left = 10
         self.top = 10
@@ -193,7 +194,8 @@ class Minesweeper(Sap):
                     min += 1
                 if self.board[x1 + 1][y1 + 1] == 10:
                     min += 1
-                cor.append([str(min), x1, y1])
+                if [55555, x1, y1] not in cor:
+                    cor.append([str(min), x1, y1])
             elif x1 == 0 and y1 == 0 and self.board[x1][y1] != 10:
                 if self.board[x1 + 1][y1] == 10:
                     min += 1
@@ -201,7 +203,8 @@ class Minesweeper(Sap):
                     min += 1
                 if self.board[x1][y1 + 1] == 10:
                     min += 1
-                cor.append([str(min), x1, y1])
+                if [55555, x1, y1] not in cor:
+                    cor.append([str(min), x1, y1])
             elif x1 == 0 and 0 < y1 < self.width - 1 and self.board[x1][
                 y1] != 10:
 
@@ -215,7 +218,8 @@ class Minesweeper(Sap):
                     min += 1
                 if self.board[x1 + 1][y1 + 1] == 10:
                     min += 1
-                cor.append([str(min), x1, y1])
+                if [55555, x1, y1] not in cor:
+                    cor.append([str(min), x1, y1])
             elif x1 == 0 and y1 == self.width - 1 and self.board[x1][y1] != 10:
                 if self.board[x1][y1 - 1] == 10:
                     min += 1
@@ -223,7 +227,8 @@ class Minesweeper(Sap):
                     min += 1
                 if self.board[x1 + 1][y1] == 10:
                     min += 1
-                cor.append([str(min), x1, y1])
+                if [55555, x1, y1] not in cor:
+                    cor.append([str(min), x1, y1])
             elif 0 < x1 < self.height - 1 and y1 == self.width - 1 and \
                     self.board[x1][y1] != 10:
 
@@ -237,7 +242,8 @@ class Minesweeper(Sap):
                     min += 1
                 if self.board[x1 + 1][y1 - 1] == 10:
                     min += 1
-                cor.append([str(min), x1, y1])
+                if [55555, x1, y1] not in cor:
+                    cor.append([str(min), x1, y1])
             elif x1 == self.height - 1 and y1 == self.width - 1 and \
                     self.board[x1][
                         y1] != 10:
@@ -248,7 +254,8 @@ class Minesweeper(Sap):
                     min += 1
                 if self.board[x1][y1 - 1] == 10:
                     min += 1
-                cor.append([str(min), x1, y1])
+                if [55555, x1, y1] not in cor:
+                    cor.append([str(min), x1, y1])
             elif x1 == self.height - 1 and 0 < y1 < self.width - 1 and \
                     self.board[x1][y1] != 10:
 
@@ -262,7 +269,8 @@ class Minesweeper(Sap):
                     min += 1
                 if self.board[x1][y1 + 1] == 10:
                     min += 1
-                cor.append([str(min), x1, y1])
+                if [55555, x1, y1] not in cor:
+                    cor.append([str(min), x1, y1])
 
             elif x1 == self.height - 1 and y1 == 0 and self.board[x1][
                 y1] != 10:
@@ -272,7 +280,8 @@ class Minesweeper(Sap):
                     min += 1
                 if self.board[x1][y1 + 1] == 10:
                     min += 1
-                cor.append([str(min), x1, y1])
+                if [55555, x1, y1] not in cor:
+                    cor.append([str(min), x1, y1])
 
             elif 0 < x1 < self.height - 1 and y1 == 0 and self.board[x1][
                 y1] != 10:
@@ -287,11 +296,21 @@ class Minesweeper(Sap):
                     min += 1
                 if self.board[x1 + 1][y1 + 1] == 10:
                     min += 1
-                cor.append([str(min), x1, y1])
-            elif self.board[x1][y1] == 10:
-                cor.append([10, x1, y1])
-        else:
-            cor.append([55555, x1, y1])
+                if [55555, x1, y1] not in cor:
+                    cor.append([str(min), x1, y1])
+            elif 0 < x1 < self.height - 1 and 0 < y1 < self.width - 1:
+                if self.board[x1][y1] == 10:
+                    cor.append([10, x1, y1])
+        elif button == 3 and 0 < x1 < self.height - 1 and 0 < y1 < self.width - 1:
+            global count_flags
+            if [55555, x1, y1] in cor:
+                d = cor.index([55555, x1, y1])
+                del cor[d]
+                count_flags += 1
+            else:
+                if count_flags != 0:
+                    cor.append([55555, x1, y1])
+                    count_flags -= 1
 
 
 def draw():
@@ -320,6 +339,7 @@ sap = Sap()
 running = True
 fl = True
 start_screen()
+screen.blit(load_image("time.png"), (150, 290))
 while running:
     for event in pygame.event.get():
         if fl:
@@ -337,6 +357,7 @@ while running:
             sap.drawWindow()
             pygame.time.delay(20)
             pygame.display.flip()
+
         else:
             screen.blit(end, (0, 0))
             pygame.display.flip()
