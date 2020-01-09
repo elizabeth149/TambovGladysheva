@@ -26,8 +26,7 @@ def terminate():
 
 
 def start_screen():
-    intro_text = ["                 САПЕР", "",
-                  "", "", "                Правила:", '',
+    intro_text = ["                 САПЕР", "", "                Правила:", '',
                   "1. Число в ячейке показывает, сколько мин",
                   "скрыто вокруг данной ячейки."
                   "Это число поможет понять вам,",
@@ -43,6 +42,9 @@ def start_screen():
                   "6. Если вы хотите проверить правильность ",
                   "указанных бомб флажками, нажмите ",
                   "на 'колесико' мышки."
+                  "             Для продолжения ",
+                  "                                       нажать любую из клавиш",
+                  "",
                   ]
 
     fon = pygame.transform.scale(load_image('fon.jpg'), (900, 900))
@@ -119,22 +121,8 @@ class AnimatedSprite(pygame.sprite.Sprite):
 
 class Sap:
     def __init__(self):
-        self.width = 50
-        self.height = 50
-        self.count = 20
-        self.board = [[1] * self.width for _ in range(self.height)]
-        self.left = 10
-        self.top = 10
         self.fps = 45
-        self.left = 10
-        self.top = 10
         self.cell_size = 30
-
-    def rast(self):
-        for i in range(self.count):
-            a = random.randint(0, self.height - 1)
-            b = random.randint(0, self.width - 1)
-            self.board[a][b] = 10
 
     def drawWindow(self):
         if pygame.mouse.get_focused():
@@ -151,11 +139,25 @@ class Minesweeper(Sap):
         self.width = width
         self.height = height
         self.count = count
-        self.board = [[1] * width for _ in range(height)]
+        self.board = []
         self.left = 230
         self.top = 300
         self.cell_size = 30
         self.rast()
+
+    def rast(self):
+        self.board = [[1] * 15 for _ in range(15)]
+        for bomba in range(20):
+            a = random.randint(0, 14)
+            b = random.randint(0, 14)
+            if self.board[a][b] not in self.board:
+                self.board[a][b] = 10
+            else:
+                while self.board[a][b] in self.board:
+                    a = random.randint(0, 14)
+                    b = random.randint(0, 14)
+                self.board[a][b] = 10
+
 
     def render(self):
         for y in range(self.width):
@@ -321,6 +323,8 @@ class Minesweeper(Sap):
                             win_flag = False
                 if win_flag:
                     global winner
+                    global fl
+                    fl = False
                     winner = True
 
 
@@ -372,8 +376,11 @@ while running:
             minesweeper.render()
             screen.blit(time, (6, 350))
             draw()
+            sap.drawWindow()
             pygame.time.delay(1)
             pygame.display.flip()
+
+
         else:
             if not winner:
                 screen.blit(end, (0, 0))
