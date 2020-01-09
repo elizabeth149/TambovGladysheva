@@ -16,7 +16,6 @@ FPS = 200
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 cor = []
-bomb = False
 count_flags = 20
 time = pygame.image.load('data/time.png')
 
@@ -27,8 +26,8 @@ def terminate():
 
 
 def start_screen():
-    intro_text = ["                САПЕР", "",
-                  "", "",
+    intro_text = ["                 САПЕР", "",
+                  "", "", "                Правила:", '',
                   "1. Число в ячейке показывает, сколько мин",
                   "скрыто вокруг данной ячейки."
                   "Это число поможет понять вам,",
@@ -40,7 +39,10 @@ def start_screen():
                   "4. Что бы пометить ячейку, в которой ",
                   "находится бомба, нажмите её правой кнопкой мыши.",
                   "5. Игра продолжается до тех пор, пока ",
-                  "вы не откроете все не заминированные ячейки."
+                  "вы не откроете все не заминированные ячейки.",
+                  "6. Если вы хотите проверить правильность ",
+                  "указанных бомб флажками, нажмите ",
+                  "на 'колесико' мышки."
                   ]
 
     fon = pygame.transform.scale(load_image('fon.jpg'), (900, 900))
@@ -79,15 +81,15 @@ def load_image(name, colorkey=-1):
 
 
 class AnimatedSprite(pygame.sprite.Sprite):
-    def __init__(self, sheet, columns, rows, xy, flag=False):
+    def __init__(self, sheet, columns, rows, xy):
         super().__init__(all_sprites)
         x, y = xy
-        self.cut_sheet(sheet, columns, rows, x, y, flag)
+        self.cut_sheet(sheet, columns, rows, x, y)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.rect = self.rect.move(x, y)
 
-    def cut_sheet(self, sheet, columns, rows, x, y, flag):
+    def cut_sheet(self, sheet, columns, rows, x, y):
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
                                 sheet.get_height() // rows)
         self.frames = []
@@ -96,19 +98,18 @@ class AnimatedSprite(pygame.sprite.Sprite):
                 frame_location = (self.rect.w * i, self.rect.h * j)
                 self.frames.append(sheet.subsurface(pygame.Rect(
                     frame_location, self.rect.size)))
-        if flag:
-            for i in self.frames:
-                image = i.convert_alpha()
-                screen.blit(image, (x - 50, y - 50))
-                pygame.display.flip()
-                clock.tick(100)
-                screen.blit(background, (0, 0))
-                screen.blit(field, (230, 300))
-                minesweeper.render()
-                screen.blit(time, (6, 350))
-                draw()
-            global fl
-            fl = False
+        for i in self.frames:
+            image = i.convert_alpha()
+            screen.blit(image, (x - 50, y - 50))
+            pygame.display.flip()
+            clock.tick(100)
+            screen.blit(background, (0, 0))
+            screen.blit(field, (230, 300))
+            minesweeper.render()
+            screen.blit(time, (6, 350))
+            draw()
+        global fl
+        fl = False
         screen.blit(background, (0, 0))
         screen.blit(field, (230, 300))
         screen.blit(time, (6, 350))
@@ -343,10 +344,6 @@ def draw():
                 fullname).convert_alpha()
             screen.blit(MANUAL_CURSOR, (x1 * 30 + 230,
                                         y1 * 30 + 300))
-        else:
-            global bomb
-            bomb = True
-
 
 
 minesweeper = Minesweeper(15, 15, 20)
@@ -363,9 +360,13 @@ while running:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 minesweeper.open_cell(event.pos, event.button)
-                dragon = AnimatedSprite(load_image("bomb.png"), 9,
-                                        9,
-                                        event.pos, bomb)
+                for i in cor:
+                    min = i[0]
+                    x1 = i[1]
+                    y1 = i[2]
+                    if min == 10:
+                        dragon = AnimatedSprite(load_image("bomb.png"), 9, 9,
+                                                event.pos)
             screen.blit(background, (0, 0))
             screen.blit(field, (230, 300))
             minesweeper.render()
