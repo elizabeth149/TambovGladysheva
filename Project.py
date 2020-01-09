@@ -16,7 +16,7 @@ FPS = 200
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 cor = []
-count_flags = 20
+count_flags = 30
 time = pygame.image.load('data/time.png')
 
 
@@ -147,16 +147,17 @@ class Minesweeper(Sap):
 
     def rast(self):
         self.board = [[1] * 15 for _ in range(15)]
-        for bomba in range(20):
+        for bomba in range(30):
             a = random.randint(0, 14)
             b = random.randint(0, 14)
-            if self.board[a][b] not in self.board:
+            if self.board[a][b] != 10:
                 self.board[a][b] = 10
             else:
-                while self.board[a][b] in self.board:
+                while self.board[a][b] == 10:
                     a = random.randint(0, 14)
                     b = random.randint(0, 14)
-                self.board[a][b] = 10
+                else:
+                    self.board[a][b] = 10
 
 
     def render(self):
@@ -350,7 +351,7 @@ def draw():
                                         y1 * 30 + 300))
 
 
-minesweeper = Minesweeper(15, 15, 20)
+minesweeper = Minesweeper(15, 15, 30)
 sap = Sap()
 running = True
 fl = True
