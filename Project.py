@@ -18,6 +18,7 @@ all_sprites = pygame.sprite.Group()
 cor = []
 bomb = False
 count_flags = 20
+time = pygame.image.load('data/time.png')
 
 
 def terminate():
@@ -95,11 +96,6 @@ class AnimatedSprite(pygame.sprite.Sprite):
                 frame_location = (self.rect.w * i, self.rect.h * j)
                 self.frames.append(sheet.subsurface(pygame.Rect(
                     frame_location, self.rect.size)))
-
-        screen.blit(background, (0, 0))
-        screen.blit(field, (230, 300))
-        minesweeper.render()
-        draw()
         if flag:
             for i in self.frames:
                 image = i.convert_alpha()
@@ -109,9 +105,15 @@ class AnimatedSprite(pygame.sprite.Sprite):
                 screen.blit(background, (0, 0))
                 screen.blit(field, (230, 300))
                 minesweeper.render()
+                screen.blit(time, (6, 350))
                 draw()
             global fl
             fl = False
+        screen.blit(background, (0, 0))
+        screen.blit(field, (230, 300))
+        screen.blit(time, (6, 350))
+        minesweeper.render()
+        draw()
 
 
 class Sap:
@@ -317,11 +319,15 @@ class Minesweeper(Sap):
                         if self.board[i[1]][i[2]] != 10:
                             win_flag = False
                 if win_flag:
-                    screen.blit(win, (0, 0))
-                    pygame.display.flip()
+                    global winner
+                    winner = True
 
 
 def draw():
+    global count_flags
+    font = pygame.font.Font(None, 100)
+    text = font.render(str(count_flags), True, (255, 235, 205))
+    screen.blit(text, [60, 415])
     for i in cor:
         min = i[0]
         x1 = i[1]
@@ -349,6 +355,7 @@ running = True
 fl = True
 start_screen()
 screen.blit(load_image("time.png"), (150, 290))
+winner = False
 while running:
     for event in pygame.event.get():
         if fl:
@@ -362,13 +369,17 @@ while running:
             screen.blit(background, (0, 0))
             screen.blit(field, (230, 300))
             minesweeper.render()
+            screen.blit(time, (6, 350))
             draw()
             pygame.time.delay(1)
             pygame.display.flip()
-
         else:
-            screen.blit(end, (0, 0))
-            pygame.display.flip()
+            if not winner:
+                screen.blit(end, (0, 0))
+                pygame.display.flip()
+            else:
+                screen.blit(win, (0, 0))
+                pygame.display.flip()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 running = False
 pygame.quit()  # точное закрытие окна
