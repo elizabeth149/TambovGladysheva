@@ -18,6 +18,8 @@ all_sprites = pygame.sprite.Group()
 cor = []
 count_flags = 30
 time = pygame.image.load('data/time.png')
+pygame.mixer.music.load('fon.mp3')
+pygame.mixer.music.play()
 
 
 def terminate():
@@ -158,7 +160,6 @@ class Minesweeper(Sap):
                     b = random.randint(0, 14)
                 else:
                     self.board[a][b] = 10
-
 
     def render(self):
         for y in range(self.width):
@@ -358,6 +359,7 @@ fl = True
 start_screen()
 screen.blit(load_image("time.png"), (150, 290))
 winner = False
+run = 0
 while running:
     for event in pygame.event.get():
         if fl:
@@ -370,6 +372,9 @@ while running:
                     x1 = i[1]
                     y1 = i[2]
                     if min == 10:
+                        pygame.mixer.music.pause()
+                        pygame.mixer.music.load('boom.mp3')
+                        pygame.mixer.music.play()
                         dragon = AnimatedSprite(load_image("bomb.png"), 9, 9,
                                                 event.pos)
             screen.blit(background, (0, 0))
@@ -380,13 +385,23 @@ while running:
             sap.drawWindow()
             pygame.time.delay(1)
             pygame.display.flip()
+            pygame.mixer.music.unpause()
+            pygame.mixer.music.set_volume(0.5)
 
 
         else:
             if not winner:
+                if run == 0:
+                    pygame.mixer.music.load('end.mp3')
+                    pygame.mixer.music.play()
+                    run += 1
                 screen.blit(end, (0, 0))
                 pygame.display.flip()
             else:
+                if run == 0:
+                    pygame.mixer.music.load('win.mp3')
+                    pygame.mixer.music.play()
+                    run += 1
                 screen.blit(win, (0, 0))
                 pygame.display.flip()
             if event.type == pygame.MOUSEBUTTONDOWN:
